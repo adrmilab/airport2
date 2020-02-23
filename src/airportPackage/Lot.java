@@ -26,6 +26,17 @@ public class Lot {
         this.samolot=samolot;
     }
 
+    Lot(String id_lotu, Date data_wylotu, Date data_przylotu, String z_do, int brama, String liniaLotnicza, String skomunikowaneLotnisko, String samolot){
+        this.id_lotu=id_lotu;
+        this.data_wylotu=data_wylotu;
+        this.data_przylotu=data_przylotu;
+        this.z_do=z_do;
+        this.brama=brama;
+        this.liniaLotnicza=liniaLotnicza;
+        this.skomunikowaneLotnisko=skomunikowaneLotnisko;
+        this.samolot=samolot;
+    }
+
     public Date getData_wylotu() {
         return data_wylotu;
     }

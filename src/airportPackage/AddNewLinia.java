@@ -82,6 +82,73 @@ public class AddNewLinia extends JDialog {
         });
     }
 
+    public AddNewLinia(Main main1, LiniaLotnicza l) {
+        main1 = main;
+        setContentPane(contentPane);
+        setModal(true);
+        getRootPane().setDefaultButton(buttonOK);
+        setSize(250, 300);
+        nazwatextField.setText(l.getNazwa());
+
+
+        buttonOK.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onOK();
+            }
+        });
+
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() when cross is clicked
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() on ESCAPE
+        contentPane.registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        buttonOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String v = "";
+                try {
+                    v = nazwatextField.getText().toString();
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwa'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (v.length() == 0) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwa'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                LiniaLotnicza liniaLotnicza = new LiniaLotnicza(v);
+                try {
+                    int aux = main.modyfikujLinieLotnicza(main.finalConn,  l.getNazwa(), liniaLotnicza);
+                    setVisible(false);
+                    if (aux == 1) {
+                        JOptionPane.showMessageDialog(main, "Linia lotnicza zmodyfikowana", "Modyfikowanie", JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(main, "Nie udało się zmodyfikować linii lotniczej", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    }
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(main, "Nie udało się zmodyfikować linii lotniczej", "Błąd", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    }
+
     private void onOK() {
         // add your code here
         dispose();

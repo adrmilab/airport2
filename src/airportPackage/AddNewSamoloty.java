@@ -98,6 +98,87 @@ public class AddNewSamoloty extends JDialog {
         });
     }
 
+    public AddNewSamoloty(Main main1, Samolot sam) {
+        main1 = main;
+        setContentPane(contentPane);
+        setModal(true);
+        getRootPane().setDefaultButton(buttonOK);
+        setSize(250, 300);
+        ladownosctextField.setText(String.valueOf(sam.getLadownosc()));
+        liczbatextField.setText(String.valueOf(sam.getLiczbaMiejsc()));
+
+        buttonOK.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onOK();
+            }
+        });
+
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() when cross is clicked
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() on ESCAPE
+        contentPane.registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        buttonOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int l;
+                int s;
+                try {
+                    l = Integer.parseInt(ladownosctextField.getText().toString());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(main, "Wartość 'ładowność' musi być numerem", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (l < 0) {
+                    JOptionPane.showMessageDialog(main, "Wartość 'ładowność' nie może być ujemma", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    s = Integer.parseInt(liczbatextField.getText().toString());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(main, "Wartość 'Liczba miejsc' musi być numerem", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (s < 0) {
+                    JOptionPane.showMessageDialog(main, "Wartość 'Liczba miejsc' nie może być ujemma", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                Samolot samolot = new Samolot(
+                        l,
+                        s
+                );
+                try {
+                    int aux = main.modyfikujSamolot(main.finalConn, sam.getId(), samolot);
+                    setVisible(false);
+                    if (aux == 1) {
+                        JOptionPane.showMessageDialog(main, "Samolot zmodyfikowany", "Modyfikowanie", JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(main, "Nie udało się zmodyfikować samolotu", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(main, "Nie udało się zmodyfikować samolotu", "Błąd", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    }
+
     private void onOK() {
         // add your code here
 //        dispose();

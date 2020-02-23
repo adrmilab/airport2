@@ -110,6 +110,99 @@ public class AddNewLotnisko extends JDialog {
         });
     }
 
+    public AddNewLotnisko(Main main1, Lotnisko l) {
+        main1 = main;
+        setContentPane(contentPane);
+        setModal(true);
+        getRootPane().setDefaultButton(buttonOK);
+        setSize(250, 300);
+        nazwatextField.setText(l.getNazwa());
+        miastotextField.setText(l.getMiasto());
+        krajtextField.setText(l.getKraj());
+
+        buttonOK.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onOK();
+            }
+        });
+
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() when cross is clicked
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() on ESCAPE
+        contentPane.registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        buttonOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String n = "";
+                String m = "";
+                String k = "";
+                try {
+                    n = nazwatextField.getText().toString();
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwa'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    m = miastotextField.getText().toString();
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Miasto'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    k = krajtextField.getText().toString();
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Kraj'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (n.length() == 0) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwa'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (m.length() == 0) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Miasto'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (k.length() == 0) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Kraj'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                Lotnisko lotnisko = new Lotnisko(n, m, k);
+                try {
+                    int aux = main.modyfikujLotnisko(main.finalConn, l.getNazwa(), lotnisko);
+
+                    setVisible(false);
+
+                    if (aux == 1) {
+                        JOptionPane.showMessageDialog(main, "Lotnisko zmodyfikowane", "Modyfikowanie", JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(main, "Nie udało się zmodyfikować lotniska", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(main, "Nie udało się zmodyfikować lotniska", "Błąd", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    }
+
+
     private void onOK() {
         // add your code here
 //        dispose();
@@ -187,4 +280,5 @@ public class AddNewLotnisko extends JDialog {
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
+
 }

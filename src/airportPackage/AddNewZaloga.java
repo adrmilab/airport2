@@ -111,6 +111,116 @@ public class AddNewZaloga extends JDialog {
         });
     }
 
+    public AddNewZaloga(Main main1, int zal) {
+        main1 = main;
+
+        setContentPane(contentPane);
+        setModal(true);
+        getRootPane().setDefaultButton(buttonOK);
+        setSize(400, 600);
+        List<Osoba> osoby = main.wypiszOsoby(main.finalConn);
+        String[] columns = new String[]{};
+        Object[][] data = new Object[][]{};
+        DefaultTableModel t1;
+        data = new Object[osoby.size()][5];
+        columns = new String[]{
+                "PESEL", "IMIĘ", "NAZWISKO", "ROLA", "ID LOTÓW"
+        };
+        Object[] osoba;
+        for (int i = 0; i < osoby.size(); i++) {
+            osoba = new Object[]{
+                    osoby.get(i).getPesel(),
+                    osoby.get(i).getImie(),
+                    osoby.get(i).getNazwisko(),
+                    osoby.get(i).getRola(),
+                    osoby.get(i).getId_lotu()
+            };
+            data[i] = osoba;
+        }
+        t1 = new DefaultTableModel(data, columns);
+        table1.setModel(t1);
+        table1.setRowSelectionAllowed(true);
+        table1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+        List<String> loty = main.wypiszLotyID(main.finalConn);
+        for (int i = 0; i < loty.size(); i++) {
+            comboBox1.addItem(loty.get(i));
+        }
+        int first = -1;
+        int last = -1;
+        for (int i = 0; i < osoby.size(); i++) {
+            String a = osoby.get(i).getId_lotu();
+
+            if (a != null) {
+                Integer aux = Integer.valueOf(a);
+                if (aux == zal) {
+                    if (first == -1) {
+                        first = i;
+                    }
+                    last = i;
+                }
+            }
+
+        }
+        table1.setRowSelectionInterval(first, last);
+        comboBox1.setSelectedItem(zal);
+
+        buttonOK.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onOK();
+            }
+        });
+
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() when cross is clicked
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() on ESCAPE
+        contentPane.registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        buttonOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<Osoba> osoby = new ArrayList<Osoba>();
+                int[] wybrane = table1.getSelectedRows();
+                for (int i = 0; i < wybrane.length; i++) {
+                    osoby.add(new Osoba(table1.getModel().getValueAt(wybrane[i], 0).toString(),
+                            table1.getModel().getValueAt(wybrane[i], 1).toString(),
+                            table1.getModel().getValueAt(wybrane[i], 2).toString(),
+                            table1.getModel().getValueAt(wybrane[i], 3).toString()));
+                }
+
+                Zaloga zaloga = new Zaloga(osoby);
+                try {
+                    main.usunZaloge(main.finalConn, String.valueOf(zal));
+                    int aux = main.dodajZaloge(main.finalConn, zaloga, comboBox1.getSelectedItem().toString());
+                    setVisible(false);
+                    if (aux == 1) {
+                        JOptionPane.showMessageDialog(main, "Zaloga dodana", "Dodawanie", JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(main, "Nie udało się dodać załogi", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(main, "Nie udało się dodać załogi", "Błąd", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    }
+
     private void onOK() {
         // add your code here
 //        dispose();

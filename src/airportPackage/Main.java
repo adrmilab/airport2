@@ -116,9 +116,9 @@ public class Main extends Component {
                         break;
                     case "LOTY":
                         List<Lot> loty = wypiszLoty(finalConn);
-                        data = new Object[loty.size()][7];
+                        data = new Object[loty.size()][8];
                         columns = new String[]{
-                                "ID", "RODZAJ", "WYLOT", "PRZYLOT", "BRAMA", "LINIA LOTNICZA", "LOTNISKO"
+                                "ID", "RODZAJ", "WYLOT", "PRZYLOT", "BRAMA", "LINIA LOTNICZA", "LOTNISKO", "SAMOLOT"
                         };
                         Object[] lot;
                         for (int i = 0; i < loty.size(); i++) {
@@ -129,7 +129,8 @@ public class Main extends Component {
                                     loty.get(i).getData_przylotu().toString(),
                                     loty.get(i).getBrama(),
                                     loty.get(i).getLiniaLotnicza(),
-                                    loty.get(i).getSkomunikowaneLotnisko()
+                                    loty.get(i).getSkomunikowaneLotnisko(),
+                                    loty.get(i).getSamolot()
                             };
                             data[i] = lot;
                         }
@@ -209,13 +210,14 @@ public class Main extends Component {
                         break;
                     case "SAMOLOTY":
                         List<Samolot> samoloty = wypiszSamoloty(finalConn);
-                        data = new Object[samoloty.size()][2];
+                        data = new Object[samoloty.size()][3];
                         columns = new String[]{
-                                "ŁADOWNOŚĆ", "LICZBA MIEJSC"
+                                "ID", "ŁADOWNOŚĆ", "LICZBA MIEJSC"
                         };
                         Object[] samolot;
                         for (int i = 0; i < samoloty.size(); i++) {
                             samolot = new Object[]{
+                                    samoloty.get(i).getId(),
                                     samoloty.get(i).getLadownosc(),
                                     samoloty.get(i).getLiczbaMiejsc()
 
@@ -223,6 +225,7 @@ public class Main extends Component {
                             data[i] = samolot;
                         }
                         columnacomboBox.removeAllItems();
+                        columnacomboBox.addItem("ID");
                         columnacomboBox.addItem("ŁADOWNOŚĆ");
                         columnacomboBox.addItem("LICZBA MIEJSC");
                         break;
@@ -336,8 +339,8 @@ public class Main extends Component {
                         break;
                     case "SAMOLOTY":
                         int wybrane7 = table1.getSelectedRow();
-                        usunSamolot(finalConn, Integer.parseInt(table1.getModel().getValueAt(wybrane7, 0).toString()),
-                                Integer.parseInt(table1.getModel().getValueAt(wybrane7, 1).toString()));
+                        usunSamolot(finalConn, Integer.parseInt(table1.getModel().getValueAt(wybrane7, 1).toString()),
+                                Integer.parseInt(table1.getModel().getValueAt(wybrane7, 2).toString()));
 
                         break;
                     case "ZAŁOGI":
@@ -358,23 +361,82 @@ public class Main extends Component {
                         JOptionPane.showMessageDialog(Main.this, "Nie można ręcznie modyfikować biletów!", "Błąd", JOptionPane.INFORMATION_MESSAGE);
                         break;
                     case "BRAMY":
-                        /*int wybrane1 = table1.getSelectedRow();
-                        Brama brama=new Brama(Integer.parseInt(table1.getModel().getValueAt(wybrane1,0).toString()));
-                        usunBrame(finalConn, Integer.parseInt(table1.getModel().getValueAt(wybrane1, 0).toString()));*/
+                        int wybrane1 = table1.getSelectedRow();
+                        Brama brama = new Brama(Integer.parseInt(table1.getModel().getValueAt(wybrane1, 0).toString()));
+                        AddNewBramy dialog1 = new AddNewBramy(Main.this, brama);
+                        dialog1.setVisible(true);
                         break;
                     case "LINIE LOTNICZE":
+                        int wybrane2 = table1.getSelectedRow();
+                        LiniaLotnicza linia = new LiniaLotnicza(table1.getModel().getValueAt(wybrane2, 0).toString());
+                        AddNewLinia dialog2 = new AddNewLinia(Main.this, linia);
+                        dialog2.setVisible(true);
                         break;
                     case "LOTY":
+                        int wybrane3 = table1.getSelectedRow();
+                        Lot lot = new Lot(
+                                table1.getModel().getValueAt(wybrane3, 0).toString(),
+                                java.sql.Date.valueOf(table1.getModel().getValueAt(wybrane3, 2).toString()),
+                                java.sql.Date.valueOf(table1.getModel().getValueAt(wybrane3, 3).toString()),
+                                table1.getModel().getValueAt(wybrane3, 1).toString(),
+                                Integer.parseInt(table1.getModel().getValueAt(wybrane3, 4).toString()),
+                                table1.getModel().getValueAt(wybrane3, 5).toString(),
+                                table1.getModel().getValueAt(wybrane3, 6).toString(),
+                                table1.getModel().getValueAt(wybrane3, 7).toString()
+                        );
+                        AddNewLot dialog3 = new AddNewLot(Main.this, lot);
+                        dialog3.setVisible(true);
                         break;
                     case "LOTNISKA":
+                        int wybrane4 = table1.getSelectedRow();
+                        Lotnisko lotnisko = new Lotnisko(
+                                table1.getModel().getValueAt(wybrane4, 0).toString(),
+                                table1.getModel().getValueAt(wybrane4, 1).toString(),
+                                table1.getModel().getValueAt(wybrane4, 2).toString()
+                        );
+                        AddNewLotnisko dialog4 = new AddNewLotnisko(Main.this, lotnisko);
+                        dialog4.setVisible(true);
                         break;
                     case "PASAŻEROWIE":
+                        int wybrane5 = table1.getSelectedRow();
+                        Pasazer pasazer = new Pasazer(
+                                table1.getModel().getValueAt(wybrane5, 0).toString(),
+                                table1.getModel().getValueAt(wybrane5, 1).toString(),
+                                table1.getModel().getValueAt(wybrane5, 2).toString(),
+                                table1.getModel().getValueAt(wybrane5, 3).toString(),
+                                Integer.parseInt(table1.getModel().getValueAt(wybrane5, 4).toString())
+                        );
+                        AddNewPasazer dialog5 = new AddNewPasazer(Main.this, pasazer);
+                        dialog5.setVisible(true);
                         break;
                     case "PRACOWNICY":
+                        int wybrane6 = table1.getSelectedRow();
+                        Osoba osoba = new Osoba(
+                                table1.getModel().getValueAt(wybrane6, 0).toString(),
+                                table1.getModel().getValueAt(wybrane6, 1).toString(),
+                                table1.getModel().getValueAt(wybrane6, 2).toString(),
+                                table1.getModel().getValueAt(wybrane6, 3).toString()
+                        );
+                        AddNewOsoba dialog6 = new AddNewOsoba(Main.this, osoba);
+                        dialog6.setVisible(true);
                         break;
                     case "SAMOLOTY":
+                        int wybrane7 = table1.getSelectedRow();
+                        Samolot samolot = new Samolot(
+                                Integer.parseInt(table1.getModel().getValueAt(wybrane7, 0).toString()),
+                                Integer.parseInt(table1.getModel().getValueAt(wybrane7, 1).toString()),
+                                Integer.parseInt(table1.getModel().getValueAt(wybrane7, 2).toString())
+                        );
+                        AddNewSamoloty dialog7 = new AddNewSamoloty(Main.this, samolot);
+                        dialog7.setVisible(true);
                         break;
                     case "ZAŁOGI":
+                        int wybrane8 = table1.getSelectedRow();
+                        int zalogaID = Integer.parseInt(table1.getModel().getValueAt(wybrane8, 4).toString());
+                        AddNewZaloga dialog8 = new AddNewZaloga(Main.this, zalogaID);
+//                        usunZaloge(finalConn, table1.getModel().getValueAt(wybrane8, 4).toString());
+//                        AddNewZaloga dialog8 = new AddNewZaloga(Main.this, linia);
+                        dialog8.setVisible(true);
                         break;
 
                 }
@@ -445,9 +507,9 @@ public class Main extends Component {
                             break;
                         case "LOTY":
                             List<Lot> loty = wypiszLoty(finalConn, wysz, target);
-                            data = new Object[loty.size()][7];
+                            data = new Object[loty.size()][8];
                             columns = new String[]{
-                                    "ID", "RODZAJ", "WYLOT", "PRZYLOT", "BRAMA", "LINIA LOTNICZA", "LOTNISKO"
+                                    "ID", "RODZAJ", "WYLOT", "PRZYLOT", "BRAMA", "LINIA LOTNICZA", "LOTNISKO", "SAMOLOT"
                             };
                             Object[] lot;
                             for (int i = 0; i < loty.size(); i++) {
@@ -458,7 +520,8 @@ public class Main extends Component {
                                         loty.get(i).getData_przylotu().toString(),
                                         loty.get(i).getBrama(),
                                         loty.get(i).getLiniaLotnicza(),
-                                        loty.get(i).getSkomunikowaneLotnisko()
+                                        loty.get(i).getSkomunikowaneLotnisko(),
+                                        loty.get(i).getSamolot()
                                 };
                                 data[i] = lot;
                             }
@@ -791,8 +854,6 @@ public class Main extends Component {
         Statement stmt = null;
         ResultSet rs = null;
         List<Brama> bramy = new ArrayList<Brama>();
-
-
         try {
             switch (wysz) {
                 case "NUMER":
@@ -830,10 +891,10 @@ public class Main extends Component {
         List<Samolot> samoloty = new ArrayList<Samolot>();
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            rs = stmt.executeQuery("select ladownosc, liczba_miejsc from samoloty order by liczba_miejsc asc");
+            rs = stmt.executeQuery("select id, ladownosc, liczba_miejsc from samoloty order by liczba_miejsc asc");
             while (rs.next()) {
-                Samolot samolot = new Samolot(rs.getInt(1),
-                        rs.getInt(2));
+                Samolot samolot = new Samolot(rs.getInt(1), rs.getInt(2),
+                        rs.getInt(3));
                 samoloty.add(samolot);
             }
         } catch (SQLException ex) {
@@ -853,15 +914,16 @@ public class Main extends Component {
         return samoloty;
     }
 
-    //                            columnacomboBox.removeAllItems();
-//                        columnacomboBox.addItem("ŁADOWNOŚĆ");
-//                        columnacomboBox.addItem("LICZBA MIEJSC");
+
     public static List<Samolot> wypiszSamoloty(Connection conn, String wysz, String target) {
         Statement stmt = null;
         ResultSet rs = null;
         List<Samolot> samoloty = new ArrayList<Samolot>();
         try {
             switch (wysz) {
+                case "ID":
+                    wysz = "id";
+                    break;
                 case "ŁADOWNOŚĆ":
                     wysz = "ladownosc";
                     break;
@@ -872,10 +934,10 @@ public class Main extends Component {
                     break;
             }
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            rs = stmt.executeQuery("select ladownosc, liczba_miejsc from samoloty where " + wysz + "='" + target + "' order by liczba_miejsc asc");
+            rs = stmt.executeQuery("select id, ladownosc, liczba_miejsc from samoloty where " + wysz + "='" + target + "' order by liczba_miejsc asc");
             while (rs.next()) {
                 Samolot samolot = new Samolot(rs.getInt(1),
-                        rs.getInt(2));
+                        rs.getInt(2), rs.getInt(3));
                 samoloty.add(samolot);
             }
         } catch (SQLException ex) {
@@ -1489,23 +1551,33 @@ public class Main extends Component {
 
     public static void usunLotnisko(Connection conn, String nazwa) {
         Statement stmt = null;
+        Statement stmt1 = null;
+        Statement stmt2 = null;
+        Statement stmt3 = null;
+        Statement stmt4 = null;
+        Statement stmt5 = null;
         ResultSet rs = null;
         ResultSet rs1 = null;
         int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt1 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt2 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt3 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt4 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt5 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
             rs = stmt.executeQuery("select id from loty where lotnisko_nazwa='" + nazwa + "'");
             while (rs.next()) {
-                rs1 = stmt.executeQuery("select id from bagaze where bilet_id='" + rs.getString(1) + "'");
+                rs1 = stmt1.executeQuery("select id from bagaze where bilet_id='" + rs.getString(1) + "'");
                 while (rs1.next()) {
-                    stmt.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
+                    stmt2.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
                 }
-                stmt.executeQuery("delete from bilety where bilet_id='" + rs.getString(1) + "'");
-                stmt.executeQuery("delete from loty where id='" + rs.getString(1) + "'");
+                stmt3.executeQuery("delete from bilety where bilet_id='" + rs.getString(1) + "'");
+                stmt4.executeQuery("delete from loty where id='" + rs.getString(1) + "'");
             }
             String query = "delete from lotniska where nazwa='" + nazwa + "'";
-            changes = stmt.executeUpdate(query);
+            changes = stmt5.executeUpdate(query);
             //można tak sprawdzac czy jest poprawnie usunięte
             System.out.println("Usunieto " + changes + " lotnisk/lotnisko.");
         } catch (SQLException ex) {
@@ -1518,6 +1590,41 @@ public class Main extends Component {
                     stmt.close();
                 } catch (SQLException e) { /* kod obsługi */ }
             }
+            if (stmt1 != null) {
+                try {
+                    stmt1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt2 != null) {
+                try {
+                    stmt2.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt3 != null) {
+                try {
+                    stmt3.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt4 != null) {
+                try {
+                    stmt4.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt5 != null) {
+                try {
+                    stmt5.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs1 != null) {
+                try {
+                    rs1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
         }
         if (aux == 1) {
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto lotnisko.", "Błąd", JOptionPane.ERROR_MESSAGE);
@@ -1526,23 +1633,33 @@ public class Main extends Component {
 
     public static void usunLinieLotnicza(Connection conn, String nazwa) {
         Statement stmt = null;
+        Statement stmt1 = null;
+        Statement stmt2 = null;
+        Statement stmt3 = null;
+        Statement stmt4 = null;
+        Statement stmt5 = null;
         ResultSet rs = null;
         ResultSet rs1 = null;
         int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt1 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt2 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt3 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt4 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt5 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
             rs = stmt.executeQuery("select id from loty where linia_lotnicza_nazwa='" + nazwa + "'");
             while (rs.next()) {
-                rs1 = stmt.executeQuery("select id from bagaze where bilet_id='" + rs.getString(1) + "'");
+                rs1 = stmt1.executeQuery("select id from bagaze where bilet_id='" + rs.getString(1) + "'");
                 while (rs1.next()) {
-                    stmt.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
+                    stmt2.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
                 }
-                stmt.executeQuery("delete from bilety where bilet_id='" + rs.getString(1) + "'");
-                stmt.executeQuery("delete from loty where id='" + rs.getString(1) + "'");
+                stmt3.executeQuery("delete from bilety where bilet_id='" + rs.getString(1) + "'");
+                stmt4.executeQuery("delete from loty where id='" + rs.getString(1) + "'");
             }
             String query = "delete from linie_lotnicze where nazwa='" + nazwa + "'";
-            changes = stmt.executeUpdate(query);
+            changes = stmt5.executeUpdate(query);
             //można tak sprawdzac czy jest poprawnie usunięte
             System.out.println("Usunieto " + changes + " linie lotnicza.");
         } catch (SQLException ex) {
@@ -1555,6 +1672,41 @@ public class Main extends Component {
                     stmt.close();
                 } catch (SQLException e) { /* kod obsługi */ }
             }
+            if (stmt1 != null) {
+                try {
+                    stmt1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt2 != null) {
+                try {
+                    stmt2.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt3 != null) {
+                try {
+                    stmt3.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt4 != null) {
+                try {
+                    stmt4.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt5 != null) {
+                try {
+                    stmt5.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs1 != null) {
+                try {
+                    rs1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
         }
         if (aux == 1) {
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto linię.", "Błąd", JOptionPane.ERROR_MESSAGE);
@@ -1562,24 +1714,42 @@ public class Main extends Component {
     }
 
     public static void usunBrame(Connection conn, int numer) {
+
+
         Statement stmt = null;
+        Statement stmt1 = null;
+        Statement stmt2 = null;
+        Statement stmt3 = null;
+        Statement stmt4 = null;
+        Statement stmt5 = null;
+        Statement stmt6 = null;
         ResultSet rs = null;
         ResultSet rs1 = null;
+        ResultSet rs2 = null;
         int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt1 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt2 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt3 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt4 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt5 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt6 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
             rs = stmt.executeQuery("select id from loty where brama_numer=" + numer);
             while (rs.next()) {
-                rs1 = stmt.executeQuery("select id from bagaze where bilet_id='" + rs.getString(1) + "'");
+                rs1 = stmt1.executeQuery("select id from bagaze where bilet_id='" + rs.getString(1) + "'");
                 while (rs1.next()) {
-                    stmt.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
+                    stmt2.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
                 }
-                stmt.executeQuery("delete from bilety where bilet_id='" + rs.getString(1) + "'");
-                stmt.executeQuery("delete from loty where id='" + rs.getString(1) + "'");
+                rs2 = stmt6.executeQuery("select id from bilety where lot_id='" + rs.getString(1) + "'");
+                while (rs2.next()) {
+                    stmt3.executeQuery("delete from bilety where id='" + rs2.getString(1) + "'");
+                }
+                stmt4.executeQuery("delete from loty where id='" + rs.getString(1) + "'");
             }
             String query = "delete from bramy where numer='" + numer + "'";
-            changes = stmt.executeUpdate(query);
+            changes = stmt5.executeUpdate(query);
             //można tak sprawdzac czy jest poprawnie usunięte
             System.out.println("Usunieto " + changes + " brame/bramy.");
         } catch (SQLException ex) {
@@ -1592,6 +1762,52 @@ public class Main extends Component {
                     stmt.close();
                 } catch (SQLException e) { /* kod obsługi */ }
             }
+            if (stmt1 != null) {
+                try {
+                    stmt1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt2 != null) {
+                try {
+                    stmt2.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt3 != null) {
+                try {
+                    stmt3.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt4 != null) {
+                try {
+                    stmt4.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt5 != null) {
+                try {
+                    stmt5.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt6 != null) {
+                try {
+                    stmt6.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs1 != null) {
+                try {
+                    rs1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs2 != null) {
+                try {
+                    rs2.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+
         }
         if (aux == 1) {
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto bramę.", "Błąd", JOptionPane.ERROR_MESSAGE);
@@ -1601,6 +1817,12 @@ public class Main extends Component {
 
     public static void usunSamolot(Connection conn, int ladownosc, int liczba_miejsc) {
         Statement stmt = null;
+        Statement stmt1 = null;
+        Statement stmt2 = null;
+        Statement stmt3 = null;
+        Statement stmt4 = null;
+        Statement stmt5 = null;
+        Statement stmt6 = null;
         ResultSet rs = null;
         ResultSet rs1 = null;
         ResultSet rs2 = null;
@@ -1609,20 +1831,26 @@ public class Main extends Component {
         int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt1 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt2 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt3 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt4 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt5 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt6 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
             rs2 = stmt.executeQuery("select id from samoloty where ladownosc=" + ladownosc + " and liczba_miejsc=" + liczba_miejsc);
             while (rs2.next()) {
                 pom1 = rs2.getString(1);
-                rs = stmt.executeQuery("select id from loty where samolot_id=" + pom1);
+                rs = stmt1.executeQuery("select id from loty where samolot_id=" + pom1);
                 while (rs.next()) {
                     pom2 = rs.getString(1);
-                    rs1 = stmt.executeQuery("select id from bilety where lot_id='" + pom2 + "'");
+                    rs1 = stmt2.executeQuery("select id from bilety where lot_id='" + pom2 + "'");
                     while (rs1.next()) {
-                        stmt.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
+                        stmt3.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
                     }
-                    stmt.executeQuery("delete from bilety where id='" + pom2 + "'");
+                    stmt4.executeQuery("delete from bilety where id='" + pom2 + "'");
                 }
-                stmt.executeQuery("delete from loty where id='" + pom1 + "'");
-                stmt.executeUpdate("delete from samoloty where id='" + pom1 + "'");
+                stmt5.executeQuery("delete from loty where id='" + pom1 + "'");
+                stmt6.executeUpdate("delete from samoloty where id='" + pom1 + "'");
             }
         } catch (SQLException ex) {
             System.out.println("Bład wykonania polecenia" + ex.toString());
@@ -1634,6 +1862,51 @@ public class Main extends Component {
                     stmt.close();
                 } catch (SQLException e) { /* kod obsługi */ }
             }
+            if (stmt1 != null) {
+                try {
+                    stmt1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt2 != null) {
+                try {
+                    stmt2.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt3 != null) {
+                try {
+                    stmt3.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt4 != null) {
+                try {
+                    stmt4.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt5 != null) {
+                try {
+                    stmt5.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt6 != null) {
+                try {
+                    stmt6.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs1 != null) {
+                try {
+                    rs1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs2 != null) {
+                try {
+                    rs2.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
         }
         if (aux == 1) {
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto samolot.", "Błąd", JOptionPane.ERROR_MESSAGE);
@@ -1642,16 +1915,20 @@ public class Main extends Component {
 
     public static void usunPasazera(Connection conn, String pesel) {
         Statement stmt = null;
+        Statement stmt1 = null;
+        Statement stmt2 = null;
         ResultSet rs = null;
         int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt1 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmt2 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
             rs = stmt.executeQuery("select id from bilety where pasazer_pesel='" + pesel + "'");
             while (rs.next()) {
                 String pomocniczy = rs.getString(1);
-                stmt.executeQuery("delete from bagaze where bilet_id='" + pomocniczy + "'");
-                stmt.executeQuery("update bilety set pasazer_pesel \"NULL\" where id='" + pomocniczy + "'");
+                stmt1.executeQuery("delete from bagaze where bilet_id='" + pomocniczy + "'");
+                stmt2.executeQuery("update bilety set pasazer_pesel \"NULL\" where id='" + pomocniczy + "'");
             }
             String query = "delete from pasazerowie where pesel='" + pesel + "'";
             changes = stmt.executeUpdate(query);
@@ -1660,13 +1937,29 @@ public class Main extends Component {
         } catch (SQLException ex) {
             System.out.println("Bład wykonania polecenia" + ex.toString());
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Nie udało się usunąć pasażera", "Błąd", JOptionPane.ERROR_MESSAGE);
-
+            aux = -1;
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) { /* kod obsługi */ }
             }
+            if (stmt1 != null) {
+                try {
+                    stmt1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt2 != null) {
+                try {
+                    stmt2.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+
         }
         if (aux == 1) {
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto pasażera.", "Błąd", JOptionPane.ERROR_MESSAGE);
@@ -1701,14 +1994,16 @@ public class Main extends Component {
 
     public static void usunOsobeZZalogi(Connection conn, String pesel) {
         Statement stmt = null;
+        Statement stmt1 = null;
         int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement();
+            stmt1 = conn.createStatement();
             String query1 = "delete from osoby where pesel='" + pesel + "'";
             stmt.executeUpdate(query1);
             String query = "delete from zalogi where osoby_pesel='" + pesel + "'";
-            changes = stmt.executeUpdate(query);
+            changes = stmt1.executeUpdate(query);
             //można tak sprawdzac czy jest poprawnie usunięte
             System.out.println("Usunieto " + changes + " osobe/osob.");
         } catch (SQLException ex) {
@@ -1719,6 +2014,11 @@ public class Main extends Component {
             if (stmt != null) {
                 try {
                     stmt.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (stmt1 != null) {
+                try {
+                    stmt1.close();
                 } catch (SQLException e) { /* kod obsługi */ }
             }
         }
@@ -1778,6 +2078,17 @@ public class Main extends Component {
                     stmt4.close();
                 } catch (SQLException e) { /* kod obsługi */ }
             }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs1 != null) {
+                try {
+                    rs1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+
         }
         if (aux == 1) {
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto lot.", "Błąd", JOptionPane.ERROR_MESSAGE);
@@ -1855,7 +2166,7 @@ public class Main extends Component {
         int aux = 1;
         try {
             stmt1 = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            rs = stmt1.executeQuery("select max(id) from samoloty");
+            rs = stmt1.executeQuery("select max(CAST(id AS INT)) from samoloty");
             rs.next();
             int liczba = parseInt(rs.getString(1)) + 1;
             stmt = conn.prepareStatement("insert into samoloty(id,ladownosc,liczba_miejsc) values(?, ?, ?)");
@@ -1959,6 +2270,16 @@ public class Main extends Component {
                     stmt.close();
                 } catch (SQLException e) { /* kod obsługi */ }
             }
+            if (stmt1 != null) {
+                try {
+                    stmt1.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (cstmt != null) {
+                try {
+                    cstmt.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
         }
         return aux;
     }
@@ -2010,6 +2331,11 @@ public class Main extends Component {
             if (stmt != null) {
                 try {
                     stmt.close();
+                } catch (SQLException e) { /* kod obsługi */ }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
                 } catch (SQLException e) { /* kod obsługi */ }
             }
         }
@@ -2070,31 +2396,19 @@ public class Main extends Component {
 
     //te funkcje nie sa implementowane bo działaja na zasadzie usun rekord i wstaw nowy ze zmiana
     //===========================================================================================
-    //TODO: W tej wchili funkcje modyfikacji są kopią funkcji usun. Idea jest żeby je zastosować jako alternatywy w formularzach "Add"
-    public static int modyfikujLotnisko(Connection conn, String nazwa) {
+    public static int modyfikujLotnisko(Connection conn, String nazwa, Lotnisko lotnisko) {
         Statement stmt = null;
-        ResultSet rs = null;
-        ResultSet rs1 = null;
         int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            rs = stmt.executeQuery("select id from loty where lotnisko_nazwa='" + nazwa + "'");
-            while (rs.next()) {
-                rs1 = stmt.executeQuery("select id from bagaze where bilet_id='" + rs.getString(1) + "'");
-                while (rs1.next()) {
-                    stmt.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
-                }
-                stmt.executeQuery("delete from bilety where bilet_id='" + rs.getString(1) + "'");
-                stmt.executeQuery("delete from loty where id='" + rs.getString(1) + "'");
-            }
-            String query = "delete from lotniska where nazwa='" + nazwa + "'";
+
+            String query = "update lotniska set nazwa='" + lotnisko.getNazwa() + "', miasto='" + lotnisko.getMiasto() + "', kraj='" + lotnisko.getKraj() + "' where nazwa='" + nazwa + "'";
             changes = stmt.executeUpdate(query);
             //można tak sprawdzac czy jest poprawnie usunięte
-            System.out.println("Usunieto " + changes + " lotnisk/lotnisko.");
+            System.out.println("Zmodyfikowano " + changes + " lotnisk/lotnisko.");
         } catch (SQLException ex) {
             System.out.println("Bład wykonania polecenia" + ex.toString());
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Nie udało się usunąć lotniska", "Błąd", JOptionPane.ERROR_MESSAGE);
             aux = -1;
         } finally {
             if (stmt != null) {
@@ -2103,36 +2417,21 @@ public class Main extends Component {
                 } catch (SQLException e) { /* kod obsługi */ }
             }
         }
-        if (aux == 1) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto lotnisko.", "Błąd", JOptionPane.ERROR_MESSAGE);
-        }
-        return 1;
+        return aux;
     }
 
-    public static int modyfikujLinieLotnicza(Connection conn, String nazwa) {
+    public static int modyfikujLinieLotnicza(Connection conn, String nazwa, LiniaLotnicza linia) {
         Statement stmt = null;
-        ResultSet rs = null;
-        ResultSet rs1 = null;
         int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            rs = stmt.executeQuery("select id from loty where linia_lotnicza_nazwa='" + nazwa + "'");
-            while (rs.next()) {
-                rs1 = stmt.executeQuery("select id from bagaze where bilet_id='" + rs.getString(1) + "'");
-                while (rs1.next()) {
-                    stmt.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
-                }
-                stmt.executeQuery("delete from bilety where bilet_id='" + rs.getString(1) + "'");
-                stmt.executeQuery("delete from loty where id='" + rs.getString(1) + "'");
-            }
-            String query = "delete from linie_lotnicze where nazwa='" + nazwa + "'";
+            String query = "update bramy set nazwa='" + linia.getNazwa() + "' where nazwa='" + nazwa + "'";
             changes = stmt.executeUpdate(query);
             //można tak sprawdzac czy jest poprawnie usunięte
-            System.out.println("Usunieto " + changes + " linie lotnicza.");
+            System.out.println("Zmodyfikowano " + changes + " linie lotnicza.");
         } catch (SQLException ex) {
             System.out.println("Bład wykonania polecenia" + ex.toString());
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Nie udało się usunąć linię", "Błąd", JOptionPane.ERROR_MESSAGE);
             aux = -1;
         } finally {
             if (stmt != null) {
@@ -2141,36 +2440,23 @@ public class Main extends Component {
                 } catch (SQLException e) { /* kod obsługi */ }
             }
         }
-        if (aux == 1) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto linię.", "Błąd", JOptionPane.ERROR_MESSAGE);
-        }
-        return 1;
+
+        return aux;
     }
 
-    public static int modyfikujBrame(Connection conn, int numer) {
+
+    public static int modyfikujBrame(Connection conn, int numer, Brama brama) {
         Statement stmt = null;
-        ResultSet rs = null;
-        ResultSet rs1 = null;
         int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            rs = stmt.executeQuery("select id from loty where brama_numer=" + numer);
-            while (rs.next()) {
-                rs1 = stmt.executeQuery("select id from bagaze where bilet_id='" + rs.getString(1) + "'");
-                while (rs1.next()) {
-                    stmt.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
-                }
-                stmt.executeQuery("delete from bilety where bilet_id='" + rs.getString(1) + "'");
-                stmt.executeQuery("delete from loty where id='" + rs.getString(1) + "'");
-            }
-            String query = "delete from bramy where numer='" + numer + "'";
+            String query = "update bramy set numer=" + brama.getNumer() + " where numer=" + numer;
             changes = stmt.executeUpdate(query);
             //można tak sprawdzac czy jest poprawnie usunięte
-            System.out.println("Usunieto " + changes + " brame/bramy.");
+            System.out.println("Zmodyfikowano " + changes + " brame/bramy.");
         } catch (SQLException ex) {
             System.out.println("Bład wykonania polecenia" + ex.toString());
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Nie udało się usunąć bramy", "Błąd", JOptionPane.ERROR_MESSAGE);
             aux = -1;
         } finally {
             if (stmt != null) {
@@ -2179,41 +2465,24 @@ public class Main extends Component {
                 } catch (SQLException e) { /* kod obsługi */ }
             }
         }
-        if (aux == 1) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto bramę.", "Błąd", JOptionPane.ERROR_MESSAGE);
-        }
-        return 1;
+
+        return aux;
 
     }
 
-    public static int modyfikujSamolot(Connection conn, int ladownosc, int liczba_miejsc) {
+    public static int modyfikujSamolot(Connection conn, int id, Samolot samolot) {
         Statement stmt = null;
-        ResultSet rs = null;
-        ResultSet rs1 = null;
-        ResultSet rs2 = null;
-        String pom1;
-        String pom2;
+        int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            rs2 = stmt.executeQuery("select id from samoloty where ladownosc=" + ladownosc + " and liczba_miejsc=" + liczba_miejsc);
-            while (rs2.next()) {
-                pom1 = rs2.getString(1);
-                rs = stmt.executeQuery("select id from loty where samolot_id=" + pom1);
-                while (rs.next()) {
-                    pom2 = rs.getString(1);
-                    rs1 = stmt.executeQuery("select id from bilety where lot_id='" + pom2 + "'");
-                    while (rs1.next()) {
-                        stmt.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
-                    }
-                    stmt.executeQuery("delete from bilety where id='" + pom2 + "'");
-                }
-                stmt.executeQuery("delete from loty where id='" + pom1 + "'");
-                stmt.executeUpdate("delete from samoloty where id='" + pom1 + "'");
-            }
+
+            String query = "update samoloty set ladownosc=" + samolot.getLadownosc() + ", liczba_miejsc=" + samolot.getLiczbaMiejsc() + " where id=" + id;
+            changes = stmt.executeUpdate(query);
+            //można tak sprawdzac czy jest poprawnie usunięte
+            System.out.println("Zmodyfikowano " + changes + " samolot/y.");
         } catch (SQLException ex) {
             System.out.println("Bład wykonania polecenia" + ex.toString());
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Nie udało się usunąć samolotu", "Błąd", JOptionPane.ERROR_MESSAGE);
             aux = -1;
         } finally {
             if (stmt != null) {
@@ -2222,33 +2491,22 @@ public class Main extends Component {
                 } catch (SQLException e) { /* kod obsługi */ }
             }
         }
-        if (aux == 1) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto samolot.", "Błąd", JOptionPane.ERROR_MESSAGE);
-        }
-        return 1;
+        return aux;
     }
 
-    public static int modyfikujPasazera(Connection conn, String pesel) {
+    public static int modyfikujPasazera(Connection conn, String pesel, Pasazer pasazer) {
         Statement stmt = null;
-        ResultSet rs = null;
         int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            rs = stmt.executeQuery("select id from bilety where pasazer_pesel='" + pesel + "'");
-            while (rs.next()) {
-                String pomocniczy = rs.getString(1);
-                stmt.executeQuery("delete from bagaze where bilet_id='" + pomocniczy + "'");
-                stmt.executeQuery("update bilety set pasazer_pesel \"NULL\" where id='" + pomocniczy + "'");
-            }
-            String query = "delete from pasazerowie where pesel='" + pesel + "'";
+            String query = "update pasazerowie set pesel='" + pasazer.getPesel() + "', imie='" + pasazer.getImie() + "', nazwisko='" + pasazer.getNazwisko() + "' where pesel='" + pesel + "'";
             changes = stmt.executeUpdate(query);
             //można tak sprawdzac czy jest poprawnie usunięte
-            System.out.println("Usunieto " + changes + " pasazera/pasazerow.");
+            System.out.println("Zmodyfikowano " + changes + " pasazera/pasazerow.");
         } catch (SQLException ex) {
             System.out.println("Bład wykonania polecenia" + ex.toString());
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Nie udało się usunąć pasażera", "Błąd", JOptionPane.ERROR_MESSAGE);
-
+            aux = -1;
         } finally {
             if (stmt != null) {
                 try {
@@ -2256,25 +2514,44 @@ public class Main extends Component {
                 } catch (SQLException e) { /* kod obsługi */ }
             }
         }
-        if (aux == 1) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto pasażera.", "Błąd", JOptionPane.ERROR_MESSAGE);
-        }
-        return 1;
+        return aux;
     }
 
-    public static int modyfikujZaloge(Connection conn, String lot_id) {
+//    public static int modyfikujZaloge(Connection conn, String lot_id) {
+//        Statement stmt = null;
+//        int changes = 0;
+//        int aux = 1;
+//        try {
+//            stmt = conn.createStatement();
+//            String query = "delete from Zalogi where loty_id='" + lot_id + "'";
+//            changes = stmt.executeUpdate(query);
+//            //można tak sprawdzac czy jest poprawnie usunięte
+//            System.out.println("Zmodyfikowano " + changes + " zaloge/zalogi.");
+//        } catch (SQLException ex) {
+//            System.out.println("Bład wykonania polecenia" + ex.toString());
+//            aux = -1;
+//        } finally {
+//            if (stmt != null) {
+//                try {
+//                    stmt.close();
+//                } catch (SQLException e) { /* kod obsługi */ }
+//            }
+//        }
+//        return aux;
+//    }
+
+    public static int modyfikujOsobeZZalogi(Connection conn, String pesel, Osoba osoba) {
         Statement stmt = null;
         int changes = 0;
         int aux = 1;
         try {
             stmt = conn.createStatement();
-            String query = "delete from Zalogi where loty_id='" + lot_id + "'";
+            String query = "update osoby set pesel='" + osoba.getPesel() + "', imie='" + osoba.getImie() + "', nazwisko='" + osoba.getNazwisko() + "', rola='" + osoba.getRola() + "' where pesel='" + pesel + "'";
             changes = stmt.executeUpdate(query);
             //można tak sprawdzac czy jest poprawnie usunięte
-            System.out.println("Usunieto " + changes + " zaloge/zalogi.");
+            System.out.println("Zmodyfikowano " + changes + " osobe/osob.");
         } catch (SQLException ex) {
             System.out.println("Bład wykonania polecenia" + ex.toString());
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Nie udało się usunąć załogi", "Błąd", JOptionPane.ERROR_MESSAGE);
             aux = -1;
         } finally {
             if (stmt != null) {
@@ -2283,64 +2560,33 @@ public class Main extends Component {
                 } catch (SQLException e) { /* kod obsługi */ }
             }
         }
-        if (aux == 1) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto załogę.", "Błąd", JOptionPane.ERROR_MESSAGE);
-        }
-        return 1;
+        return aux;
     }
 
-    public static int modyfikujOsobeZZalogi(Connection conn, String pesel) {
+    public static int modyfikujLot(Connection conn, String id_lotu, Lot lot) throws ParseException {
         Statement stmt = null;
         int changes = 0;
         int aux = 1;
-        try {
-            stmt = conn.createStatement();
-            String query1 = "delete from osoby where pesel='" + pesel + "'";
-            stmt.executeUpdate(query1);
-            String query = "delete from zalogi where osoby_pesel='" + pesel + "'";
-            changes = stmt.executeUpdate(query);
-            //można tak sprawdzac czy jest poprawnie usunięte
-            System.out.println("Usunieto " + changes + " osobe/osob.");
-        } catch (SQLException ex) {
-            System.out.println("Bład wykonania polecenia" + ex.toString());
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Nie udało się usunąć osobę", "Błąd", JOptionPane.ERROR_MESSAGE);
-            aux = -1;
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) { /* kod obsługi */ }
-            }
-        }
-        if (aux == 1) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto osobę.", "Błąd", JOptionPane.ERROR_MESSAGE);
-        }
-        return 1;
-    }
+        String dp = "dd-MMM-yy";
+        String sp = "yyyy-MM-dd";
+        SimpleDateFormat sf = new SimpleDateFormat(sp, Locale.ENGLISH);
+        SimpleDateFormat df = new SimpleDateFormat(dp, Locale.ENGLISH);
+        String wylot;
+        String przylot;
+        Date date;
+        date = sf.parse(lot.getData_wylotu().toString());
+        wylot = df.format(date).toUpperCase();
+        date = sf.parse(lot.getData_przylotu().toString());
+        przylot = df.format(date).toUpperCase();
 
-    public static int modyfikujLot(Connection conn, String id_lotu) {
-        Statement stmt = null;
-        ResultSet rs = null;
-        ResultSet rs1 = null;
-        int changes = 0;
-        int aux = 1;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            rs = stmt.executeQuery("select id from bilety where id='" + id_lotu + "'");
-            while (rs.next()) {
-                rs1 = stmt.executeQuery("select id from bagaze where bilet_id='" + rs.getString(1) + "'");
-                while (rs1.next()) {
-                    stmt.executeQuery("delete from bagaze where bilet_id='" + rs1.getString(1) + "'");
-                }
-                stmt.executeQuery("delete from bilety where bilet_id='" + rs.getString(1) + "'");
-            }
-            String query = "delete from loty where id='" + id_lotu + "'";
+            String query = "update loty set data_wylotu='" + wylot + "', data_przylotu='" + przylot + "', rodzaj='" + lot.getZ_do() + "', brama_numer='" + String.valueOf(lot.getBrama()) + "', linia_lotnicza_nazwa='" + lot.getLiniaLotnicza() + "', lotnisko_nazwa='" + lot.getSkomunikowaneLotnisko() + "', samolot_id='" + lot.getSamolot() + "' where id='" + id_lotu + "'";
             changes = stmt.executeUpdate(query);
             //można tak sprawdzac czy jest poprawnie usunięte
-            System.out.println("Usunieto " + changes + " lot/lotow.");
+            System.out.println("Zmodyfikowano " + changes + " lot/lotow.");
         } catch (SQLException ex) {
             System.out.println("Bład wykonania polecenia" + ex.toString());
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Nie udało się usunąć lotu", "Błąd", JOptionPane.ERROR_MESSAGE);
             aux = -1;
         } finally {
             if (stmt != null) {
@@ -2349,69 +2595,7 @@ public class Main extends Component {
                 } catch (SQLException e) { /* kod obsługi */ }
             }
         }
-        if (aux == 1) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Usunięto lot.", "Błąd", JOptionPane.ERROR_MESSAGE);
-        }
-        return 1;
+        return aux;
     }
-    //modyfikuj lotnisko
 
-    //modyfikuj linie lotnicza
-
-    //modyfikuj brame
-
-    //modyfikuj samolot
-
-    //zajmij bilet
-
-    //modyfikuj pasazera
-
-    //modyfikuj bilet
-
-    //modyfikuj lot
 }
-//Kominukaty dla<<
-//>Dodaj bramy<<
-//>dodaj linie<<
-//>dodaj lot<<
-//>dodaj lotnisko<<
-//>dodaj osobe<<
-//>dodaj pasazer<<
-//>dodaj samolot<<
-//>dodaj zaloge<<
-
-//>Komunikaty dla usuwania<<
-//> bramy<<
-//> linie<<
-//> lot<<
-//> lotnisko<<
-//> osobe<<
-//> pasazer<<
-//> samolot<<
-//> zaloge<<
-
-
-
-//>Modyfikacja
-//> bramy
-//> linie
-//> lot
-//> lotnisko
-//> osobe
-//> pasazer
-//> samolot
-//> zaloge
-
-//>Wyszukiwanie (statement)
-//> bramy
-//> linie
-//> lot
-//> lotnisko
-//> osobe
-//> pasazer
-//> samolot
-//> zaloge
-
-//>Usuwanie samolotu
-//>Dodawanie samolotu
-

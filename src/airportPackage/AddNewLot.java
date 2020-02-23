@@ -112,7 +112,7 @@ public class AddNewLot extends JDialog {
                     aux = -1;
                 }
                 if (aux > 0) {
-                    if (!dataw.before(datap)) {
+                    if (datap.before(dataw)) {
                         JOptionPane.showMessageDialog(main, "Data przylotu musi być poźniejsza od daty wylotu.", "Błąd", JOptionPane.ERROR_MESSAGE);
                         aux = -1;
                         return;
@@ -140,6 +140,125 @@ public class AddNewLot extends JDialog {
                         }
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(main, "Nie udało się dodać lotu", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+
+            }
+        });
+    }
+
+    public AddNewLot(Main main1, Lot l) {
+        main1 = main;
+        setContentPane(contentPane);
+        setModal(true);
+        getRootPane().setDefaultButton(buttonOK);
+        setSize(400, 800);
+
+        rodzaj.addItem("Z");
+        rodzaj.addItem("DO");
+
+        List<String> bramy = main.wypiszBramyID(main.finalConn);
+        for (int i = 0; i < bramy.size(); i++) {
+            bramacomboBox.addItem(bramy.get(i));
+        }
+
+        List<String> linie = main.wypiszLinieLotniczeNazwy(main.finalConn);
+        for (int i = 0; i < linie.size(); i++) {
+            liniaLotniczacomboBox.addItem(linie.get(i));
+        }
+
+        List<String> lotniska = main.wypiszLotniskaNazwy(main.finalConn);
+        for (int i = 0; i < lotniska.size(); i++) {
+            lotniskocomboBox.addItem(lotniska.get(i));
+        }
+
+        List<String> samoloty = main.wypiszSamolotyID(main.finalConn);
+        for (int i = 0; i < samoloty.size(); i++) {
+            samolotComboBox.addItem(samoloty.get(i));
+        }
+        buttonOK.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onOK();
+            }
+        });
+
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
+
+
+        dwtextField.setText(l.getData_wylotu().toString());
+        dptextField.setText(l.getData_przylotu().toString());
+        rodzaj.setSelectedItem(l.getZ_do());
+        bramacomboBox.setSelectedItem(String.valueOf(l.getBrama()));
+        liniaLotniczacomboBox.setSelectedItem(l.getLiniaLotnicza());
+        lotniskocomboBox.setSelectedItem(l.getSkomunikowaneLotnisko());
+        samolotComboBox.setSelectedItem(l.getSamolot());
+
+        // call onCancel() when cross is clicked
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() on ESCAPE
+        contentPane.registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        buttonOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int aux = 1;
+                Date datap = new Date(Calendar.getInstance().getTime().getTime());
+                Date dataw = new Date(Calendar.getInstance().getTime().getTime());
+
+                try {
+                    datap = valueOf(dptextField.getText().toString());
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(main, "Niepoprawna data przylotu. Format jest YYYY-MM-DD, np. 2020-02-24", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    aux = -1;
+                }
+                try {
+                    dataw = valueOf(dwtextField.getText().toString());
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(main, "Niepoprawna data wylotu. Format jest YYYY-MM-DD, np. 2020-02-24", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    aux = -1;
+                }
+                if (aux > 0) {
+                    if (datap.before(dataw)) {
+                        JOptionPane.showMessageDialog(main, "Data przylotu musi być poźniejsza od daty wylotu.", "Błąd", JOptionPane.ERROR_MESSAGE);
+                        aux = -1;
+                        return;
+                    }
+                }
+
+
+                if (aux > 0) {
+                    Lot lot = new Lot(
+                            datap,
+                            dataw,
+                            rodzaj.getSelectedItem().toString(),
+                            Integer.parseInt(bramacomboBox.getSelectedItem().toString()),
+                            liniaLotniczacomboBox.getSelectedItem().toString(),
+                            lotniskocomboBox.getSelectedItem().toString(),
+                            samolotComboBox.getSelectedItem().toString());
+                    try {
+                        aux = main.modyfikujLot(main.finalConn, l.getId_lotu(), lot);
+                        setVisible(false);
+                        if (aux == 1) {
+                            JOptionPane.showMessageDialog(main, "Lot poprawnie zmodyfikowany", "Modyfikacja", JOptionPane.INFORMATION_MESSAGE);
+                            dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(main, "Nie udało się zmodyfikować lotu", "Błąd", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(main, "Nie udało się zmodyfikować lotu", "Błąd", JOptionPane.ERROR_MESSAGE);
                     }
                 }
 

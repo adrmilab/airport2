@@ -118,6 +118,106 @@ public class AddNewPasazer extends JDialog {
         });
     }
 
+    public AddNewPasazer(Main main1, Pasazer pa) {
+        main1 = main;
+        setContentPane(contentPane);
+        setModal(true);
+        getRootPane().setDefaultButton(buttonOK);
+        setSize(250, 300);
+        firstNametextField.setText(pa.getImie());
+        lastNametextField.setText(pa.getNazwisko());
+        peseltextField.setText(pa.getPesel());
+        buttonOK.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onOK();
+            }
+        });
+
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() when cross is clicked
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() on ESCAPE
+        contentPane.registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        buttonOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String p;
+                String n;
+                String nn;
+                try {
+                    p = peseltextField.getText().toString();
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Pesel'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (p.length() != 11) {
+                    JOptionPane.showMessageDialog(main, "Pesel musi mieć 11 znaków", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    long p1 = Long.parseLong(p);
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Wartość 'Pesel' musi być numerem", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    n = firstNametextField.getText().toString();
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwa'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (n.length() == 0) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwa'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    nn = lastNametextField.getText().toString();
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwisko'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (nn.length() == 0) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwisko'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                Pasazer pasazer = new Pasazer(
+                        p,
+                        n,
+                        nn,
+                        "-",
+                        0);
+                try {
+                    int aux = main.modyfikujPasazera(main.finalConn, pa.getPesel(), pasazer);
+                    setVisible(false);
+
+                    if (aux == 1) {
+                        JOptionPane.showMessageDialog(main, "Pasażer poprawnie zmodyfikowany", "Dodawanie", JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(main, "Błąd przy modyfikowaniu pasażera", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(main, "Błąd przy modyfikowaniu pasażera", "Błąd", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    }
+
     private void onOK() {
         // add your code here
 //        dispose();

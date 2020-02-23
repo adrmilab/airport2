@@ -123,6 +123,110 @@ public class AddNewOsoba extends JDialog {
         });
     }
 
+    public AddNewOsoba(Main main1, Osoba os) {
+        main1 = main;
+        setContentPane(contentPane);
+        setModal(true);
+        getRootPane().setDefaultButton(buttonOK);
+        setSize(250, 300);
+        comboBoxRole.addItem("Pilot");
+        comboBoxRole.addItem("Stewardessa");
+        comboBoxRole.setSelectedItem(os.getRola());
+        firstNameTextField.setText(os.getImie());
+        lastNameTextField.setText(os.getNazwisko());
+        peselEditText.setText(os.getPesel());
+
+        buttonOK.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onOK();
+            }
+        });
+
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() when cross is clicked
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
+
+        // call onCancel() on ESCAPE
+        contentPane.registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        buttonOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String p;
+                String n;
+                String nn;
+                try {
+                    p = peselEditText.getText().toString();
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Pesel'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (p.length() != 11) {
+                    JOptionPane.showMessageDialog(main, "Pesel musi mieć 11 znaków", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    long p1 = Long.parseLong(p);
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Wartość 'Pesel' musi być numerem", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    n = firstNameTextField.getText().toString();
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwa'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (n.length() == 0) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwa'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    nn = lastNameTextField.getText().toString();
+                } catch (Exception ex1) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwisko'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (nn.length() == 0) {
+                    JOptionPane.showMessageDialog(main, "Błędna wartość pola 'Nazwisko'", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+
+                Osoba osoba = new Osoba(
+                        p,
+                        n,
+                        nn,
+                        comboBoxRole.getSelectedItem().toString());
+                try {
+                    int aux = main.modyfikujOsobeZZalogi(main.finalConn, os.getPesel(), osoba);
+                    setVisible(false);
+                    if (aux == 1) {
+                        JOptionPane.showMessageDialog(main, "Zmodyfikowano pracownika", "Modyfikowanie", JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(main, "Błąd w modyfikowaniu pracownika", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(main, "Błąd w modyfikowaniu pracownika", "Błąd", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    }
+
     private void onOK() {
         // add your code here
 //        dispose();
